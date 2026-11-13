@@ -3,7 +3,7 @@ package com.mrivanplays.events;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a event which has a result.
+ * Represents an event which has a result.
  *
  * @param <R> result of event
  */

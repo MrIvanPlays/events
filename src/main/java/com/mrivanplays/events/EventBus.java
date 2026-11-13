@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Represents a bus of event listeners. */
+@SuppressWarnings({"rawtypes", "unchecked"}) // its fine
 public class EventBus {
 
   /**
@@ -237,8 +238,82 @@ public class EventBus {
     }
     CompletableFuture<T> ret = new CompletableFuture<>();
     var cont =
-        new ContinuationImpl<>(ret, event, logger, new ConcurrentLinkedQueue<>(eventListeners));
+        new SequentialContinuationImpl<>(
+            ret, event, logger, new ConcurrentLinkedQueue<>(eventListeners));
     async.execute(cont::resume); // start calling
     return ret;
+  }
+
+  /**
+   * Calls all the listeners for the inputted {@code event} in parallel and waits for all of them to
+   * finish before completing the returned future.
+   *
+   * @param event event to call
+   * @return future, completed with the event, after all listeners have been called.
+   * @param <T> event
+   */
+  @NotNull
+  public <T extends Event> CompletableFuture<T> fireParallel(@NotNull T event) {
+    Objects.requireNonNull(event, "event");
+    SortedSet<RegisteredEventListener> eventListeners = this.listeners.get(event.getClass());
+    if (eventListeners == null) {
+      return CompletableFuture.completedFuture(event);
+    }
+    CompletableFuture<T> ret = new CompletableFuture<>();
+    AtomicLong counter = new AtomicLong(eventListeners.size());
+    eventListeners.parallelStream()
+        .forEachOrdered(current -> {
+          Consumer<Throwable> callback =
+              e -> {
+                if (e != null) {
+                  logger.log(
+                      new RuntimeException(
+                          "Exception during continuation of listener for identifier '"
+                              + current.listener().identifier()
+                              + "'",
+                          e));
+                }
+                if (counter.decrementAndGet() == 0) {
+                  if (ret.isDone()) {
+                    logger.log(new IllegalStateException("Cannot complete done future"));
+                    return;
+                  }
+                  ret.complete(event);
+                }
+              };
+          current.listener().onEventFired(event, new ParallelContinuationImpl(callback));
+        });
+    return ret;
+  }
+
+  /**
+   * Calls all the listeners for the inputted {@code event} in parallel and does not wait for the
+   * outcome.
+   *
+   * @param event event to call
+   * @param <T> event
+   */
+  public <T extends Event> void fireParallelAndForget(@NotNull T event) {
+    Objects.requireNonNull(event, "event");
+    SortedSet<RegisteredEventListener> eventListeners = this.listeners.get(event.getClass());
+    if (eventListeners == null) {
+      return;
+    }
+    eventListeners.parallelStream()
+        .forEachOrdered(current -> {
+          // only exception logging callback
+          Consumer<Throwable> callback =
+              e -> {
+                if (e != null) {
+                  logger.log(
+                      new RuntimeException(
+                          "Exception during continuation of listener for identifier '"
+                              + current.listener().identifier()
+                              + "'",
+                          e));
+                }
+              };
+          current.listener().onEventFired(event, new ParallelContinuationImpl(callback));
+        });
   }
 }

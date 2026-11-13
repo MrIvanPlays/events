@@ -11,6 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
+@SuppressWarnings("rawtypes") // its fine
 public class SubscribedEventListener implements EventListener {
 
   private final SubscriptionEventListener listener;

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
-final class ContinuationImpl<T extends Event> implements Continuation {
+final class SequentialContinuationImpl<T extends Event> implements Continuation {
 
   private final CompletableFuture<T> future;
   private final T firedEvent;
@@ -14,7 +14,7 @@ final class ContinuationImpl<T extends Event> implements Continuation {
   private RegisteredEventListener current;
   private final ExceptionLogger logger;
 
-  ContinuationImpl(
+  SequentialContinuationImpl(
       CompletableFuture<T> future,
       T firedEvent,
       ExceptionLogger logger,

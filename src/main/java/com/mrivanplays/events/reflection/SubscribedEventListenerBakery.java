@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * Represents a utility class, which is to be used to bake and register event listeners, annotated
  * with {@link Subscribe} annotation.
  */
+@SuppressWarnings("unchecked") // it's checked bruh
 public class SubscribedEventListenerBakery {
 
   /**
@@ -85,5 +86,9 @@ public class SubscribedEventListenerBakery {
         bus.registerListener(entry.getKey(), sub);
       }
     }
+  }
+
+  private SubscribedEventListenerBakery() {
+    throw new IllegalArgumentException("Cannot create instance for utility class");
   }
 }

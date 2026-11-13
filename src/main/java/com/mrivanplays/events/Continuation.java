@@ -1,10 +1,10 @@
 package com.mrivanplays.events;
 
 /**
- * Represents a continuation of a event fire. {@link #resume()} shall always be called in order to
+ * Represents a continuation of an event fire. {@link #resume()} shall always be called in order to
  * call the next listener in queue. If not called, event fire would hang.
  */
-public sealed interface Continuation permits ContinuationImpl {
+public sealed interface Continuation permits SequentialContinuationImpl, ParallelContinuationImpl {
 
   /** Resumes the continuation */
   void resume();
