@@ -11,4 +11,11 @@ public sealed interface Continuation permits SequentialContinuationImpl, Paralle
 
   /** Resumes the continuation after the executed task failed */
   void resumeWithException(Throwable e);
+
+  /**
+   * Returns whether the continuation is a parallel one.
+   *
+   * @return true if parallel, false otherwise
+   */
+  boolean isParallel();
 }

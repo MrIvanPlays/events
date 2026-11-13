@@ -43,4 +43,9 @@ final class ParallelContinuationImpl implements Continuation {
   public void resumeWithException(Throwable e) {
     done.accept(e);
   }
+
+  @Override
+  public boolean isParallel() {
+    return true;
+  }
 }

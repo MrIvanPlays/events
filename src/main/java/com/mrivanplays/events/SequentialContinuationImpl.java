@@ -47,4 +47,9 @@ final class SequentialContinuationImpl<T extends Event> implements Continuation 
             e));
     this.resume();
   }
+
+  @Override
+  public boolean isParallel() {
+    return false;
+  }
 }

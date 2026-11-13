@@ -46,7 +46,8 @@ public class ParallelCallTest {
         identifier,
         TestEvent.class,
         (e, c) -> {
-          listener.accept(e);
+          e.called.incrementAndGet();
+          e.parallel.set(c.isParallel());
           c.resume();
         });
   }
@@ -56,5 +57,6 @@ public class ParallelCallTest {
     TestEvent event = bus.fireParallel(new TestEvent()).join();
 
     Assertions.assertEquals(3, event.called.get());
+    Assertions.assertTrue(event.parallel.get());
   }
 }

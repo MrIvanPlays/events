@@ -13,6 +13,7 @@ public class ContinuationCompleteExceptionallyTest {
 
     @Subscribe
     public void onEvent(TestEvent event, Continuation continuation) {
+      event.parallel.set(continuation.isParallel());
       continuation.resumeWithException(new RuntimeException("hello"));
     }
 
@@ -41,5 +42,6 @@ public class ContinuationCompleteExceptionallyTest {
 
     Assertions.assertEquals(1, event.called.get());
     Assertions.assertEquals(1, logger.caught.size());
+    Assertions.assertFalse(event.parallel.get());
   }
 }
