@@ -281,7 +281,8 @@ public class EventBus {
                   ret.complete(event);
                 }
               };
-          current.listener().onEventFired(event, new ParallelContinuationImpl(callback));
+          async.execute(
+              () -> current.listener().onEventFired(event, new ParallelContinuationImpl(callback)));
         });
     return ret;
   }
@@ -313,7 +314,8 @@ public class EventBus {
                           e));
                 }
               };
-          current.listener().onEventFired(event, new ParallelContinuationImpl(callback));
+          async.execute(
+              () -> current.listener().onEventFired(event, new ParallelContinuationImpl(callback)));
         });
   }
 }

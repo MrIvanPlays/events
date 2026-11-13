@@ -22,6 +22,7 @@
 
 package com.mrivanplays.events;
 
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +32,9 @@ import org.junit.jupiter.api.Test;
 public class ParallelCallTest {
 
   static EventBus bus =
-      EventBus.createSyncEventBus(ExceptionLogger.from(Logger.getLogger("ParallelCallTest")));
+      EventBus.createAsyncEventBus(
+          Executors.newFixedThreadPool(5),
+          ExceptionLogger.from(Logger.getLogger("ParallelCallTest")));
   static Consumer<TestEvent> listener = e -> e.called.incrementAndGet();
 
   @BeforeAll
